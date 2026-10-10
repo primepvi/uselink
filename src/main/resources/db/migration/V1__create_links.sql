@@ -1,0 +1,6 @@
+CREATE TABLE links (
+       id BIGINT NOT NULL AUTO_INCREMENT,
+       accessed_at TIMESTAMP DEFAULT NULL,
+       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,             
+       PRIMARY KEY (id)
+)

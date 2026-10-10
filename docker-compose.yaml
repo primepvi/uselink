@@ -1,0 +1,26 @@
+services:
+  mysql:
+    image: mysql/mysql-server:latest
+    container_name: uselink-mysql
+    environment: 
+      MYSQL_DATABASE: uselink
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      MYSQL_ROOT_PASSWORD: docker
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  
+  redis:
+    image: redis:7-alpine
+    container_name: uselink-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    
+volumes:
+  mysql_data:
+  redis_data:
