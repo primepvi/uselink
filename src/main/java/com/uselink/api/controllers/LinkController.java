@@ -17,14 +17,17 @@ import org.springframework.web.server.ResponseStatusException;
 import com.uselink.api.domain.link.CreateLinkRequestDTO;
 import com.uselink.api.domain.link.Link;
 import com.uselink.api.repositories.LinkRepository;
+import com.uselink.api.services.LinkShortenerService;
 
 @RestController
 @RequestMapping("/links")
 public class LinkController {
 	private final LinkRepository linkRepository;
+	private final LinkShortenerService linkShortener;
 	
-	public LinkController(LinkRepository linkRepository) {
+	public LinkController(LinkRepository linkRepository, LinkShortenerService linkShortener) {
 		this.linkRepository = linkRepository;
+		this.linkShortener = linkShortener;
 	}
 	
 	@PostMapping
@@ -33,6 +36,9 @@ public class LinkController {
 		rawLink.setTargetUrl(dto.targetUrl());
 		
 		Link link = linkRepository.save(rawLink);
+		link.setSlug(linkShortener.slugFromId(link.getId()));
+		link = linkRepository.save(link);
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(link);
 	}
 	
@@ -42,14 +48,16 @@ public class LinkController {
 				.body(linkRepository.findAll());
 	}
 	
-	@GetMapping("/{id}")
-	public Link findById(@PathVariable Long id) {
+	@GetMapping("/{slug}")
+	public Link findBySlug(@PathVariable String slug) {
+		Long id = linkShortener.idFromSlug(slug);
 		return linkRepository.findById(id)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid link id has provided."));
 	}
 	
-	@PatchMapping("/{id}/access")
-	public Link registerAccess(@PathVariable Long id) {
+	@PatchMapping("/{slug}/access")
+	public Link registerAccess(@PathVariable String slug) {
+		Long id = linkShortener.idFromSlug(slug);
 		Link link = linkRepository.findById(id).orElseThrow(() ->
 			new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid link id has provided.")
 		);
@@ -58,8 +66,9 @@ public class LinkController {
 		return linkRepository.save(link);		
 	}
 	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteById(@PathVariable Long id) {
+	@DeleteMapping("/{slug}")
+	public ResponseEntity<Void> deleteBySlug(@PathVariable String slug) {
+		Long id = linkShortener.idFromSlug(slug);
 		if (!linkRepository.existsById(id)) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid link id has provided.");
 		}

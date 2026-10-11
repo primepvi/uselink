@@ -12,6 +12,7 @@ public class Link {
     
     @Column(name = "target_url")
     private String targetUrl;
+    private String slug;
 
     @Column(name = "accessed_at")
     private LocalDateTime accessedAt;
@@ -20,20 +21,26 @@ public class Link {
     private LocalDateTime createdAt;
     
     public Link() {}
-    public Link(Long id, String targetUrl, LocalDateTime accessedAt, LocalDateTime createdAt) {
+    public Link(Long id, String targetUrl, String slug, LocalDateTime accessedAt, LocalDateTime createdAt) {
     	this.id = id;
     	this.targetUrl = targetUrl;
+    	this.slug = slug;
     	this.accessedAt = accessedAt;
     	this.createdAt = createdAt;
     }
     
     public Long getId() { return id; }
     public String getTargetUrl() { return targetUrl; }
+    public String getSlug() { return slug; }
     public LocalDateTime getAccessedAt() { return accessedAt; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     
     public void setTargetUrl(String targetUrl) {
     	this.targetUrl = targetUrl;
+    }
+    
+    public void setSlug(String slug) {
+    	this.slug = slug;
     }
     
     public void registerAccess() {
